@@ -29,9 +29,7 @@ import translate from '../locales/translate';
 import { ExecState } from 'unicoen.ts/dist/interpreter/Engine/ExecState';
 import { LangProps, ProgLangProps, Theme, ModeProps, Mode } from './Props';
 import { SyntaxErrorData } from 'unicoen.ts/dist/interpreter/mapper/SyntaxErrorData';
-// import Stopwatch from '../utils/Stopwatch';
-const Stopwatch = require('../utils/Stopwatch.js');
-console.log(Stopwatch);
+import Stopwatch from '../utils/Stopwatch';
 type Props = LangProps & ProgLangProps & ModeProps;
 type ExState = 'PREPARE' | 'SOLVING' | 'FINISH';
 interface State {
@@ -88,7 +86,7 @@ export default class Editor extends React.Component<Props, State> {
     this.sourcecode = '';
     this.sentSourcecode = '';
     this.hideAlert = this.hideAlert.bind(this);
-
+    this.timer = new Stopwatch(null, null);
     slot('debug', (controlEvent: CONTROL_EVENT, stdinText?: string) => {
       this.send(controlEvent, stdinText);
     });
@@ -300,27 +298,52 @@ export default class Editor extends React.Component<Props, State> {
   }
 
   renderExpBtns() {
+    let finishTime = '';
     const { exState } = this.state;
+    if (exState === 'PREPARE') {
+      if (this.timer !== null) {
+        this.timer.stop();
+        this.timer = null;
+      }
+      this.timer = null;
+    } else if (exState === 'FINISH') {
+      if (this.timer !== null) {
+        this.timer.stop();
+        finishTime = Math.round(this.timer.seconds()).toString() + '秒';
+        this.timer = null;
+      }
+    }
     return (
       <>
         <Button
           onClick={() => {
             this.setState({ exState: 'SOLVING', hideText: false });
-            this.timer.restart();
           }}
           disabled={exState !== 'PREPARE'}
-          ref={input => {
-            this.timer = new Stopwatch(input, input);
-          }}
         >
-          {exState === 'PREPARE'
-            ? '実験開始'
-            : Math.round(this.timer.seconds())}
+          {exState === 'PREPARE' ? (
+            '実験開始'
+          ) : exState === 'FINISH' ? (
+            finishTime
+          ) : (
+            <div
+              id="content"
+              dangerouslySetInnerHTML={{
+                __html: ''
+              }}
+              ref={c => {
+                if (this.timer === null) {
+                  this.timer = new Stopwatch(c, c);
+                  this.timer.restart();
+                }
+              }}
+            />
+          )}
         </Button>
         <Button
           onClick={() => {
+            console.log('stop');
             this.setState({ exState: 'FINISH', hideText: false });
-            this.timer.stop();
           }}
           disabled={exState !== 'SOLVING'}
         >
@@ -350,7 +373,6 @@ export default class Editor extends React.Component<Props, State> {
         this.sourcecode = translate('ja', mode);
       }
     }
-    console.log('Editor', this.state.mode);
 
     return (
       <>

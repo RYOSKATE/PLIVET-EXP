@@ -1,7 +1,7 @@
 /**
  * Created by khlee on 11/8/16.
  */
-class Stopwatch {
+export default class Stopwatch {
     constructor(display, results) {
         this.running = false;
         this.display = display;
@@ -85,7 +85,7 @@ class Stopwatch {
 
     print() {
         if(this.display){
-            this.display.innerText = this.format(this.times);
+            this.display.innerText = Math.round(this.seconds()) + '秒';
         }        
     }
 
@@ -98,6 +98,6 @@ class Stopwatch {
     }
 
     seconds(){
-        return this.times[0] *60 + this.times[1] + this.times[2] / 100;
+        return this.times[0] *60 + this.times[1] + this.times[2] / 100.0;
     }
 }
