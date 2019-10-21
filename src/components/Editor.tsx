@@ -29,7 +29,9 @@ import translate from '../locales/translate';
 import { ExecState } from 'unicoen.ts/dist/interpreter/Engine/ExecState';
 import { LangProps, ProgLangProps, Theme, ModeProps, Mode } from './Props';
 import { SyntaxErrorData } from 'unicoen.ts/dist/interpreter/mapper/SyntaxErrorData';
-
+// import Stopwatch from '../utils/Stopwatch';
+const Stopwatch = require('../utils/Stopwatch.js');
+console.log(Stopwatch);
 type Props = LangProps & ProgLangProps & ModeProps;
 type ExState = 'PREPARE' | 'SOLVING' | 'FINISH';
 interface State {
@@ -38,6 +40,7 @@ interface State {
   theme: Theme;
   mode: Mode;
   exState: ExState;
+  hideText: boolean;
 }
 
 interface TextRectangle {
@@ -69,6 +72,7 @@ export default class Editor extends React.Component<Props, State> {
   private checkbox: HTMLInputElement | null = null;
   private noAlert: boolean = false;
   private highlightIds: number[] = [];
+  private timer: any;
   constructor(props: Props) {
     super(props);
 
@@ -78,11 +82,11 @@ export default class Editor extends React.Component<Props, State> {
       showAlert: false,
       theme: 'light',
       mode,
-      exState: 'PREPARE'
+      exState: 'PREPARE',
+      hideText: false
     };
     this.sourcecode = '';
     this.sentSourcecode = '';
-
     this.hideAlert = this.hideAlert.bind(this);
 
     slot('debug', (controlEvent: CONTROL_EVENT, stdinText?: string) => {
@@ -156,7 +160,7 @@ export default class Editor extends React.Component<Props, State> {
 
     if (mode !== nextMode) {
       this.sourcecode = translate(lang, nextMode);
-      this.setState({ mode: nextMode, exState: 'PREPARE' });
+      this.setState({ mode: nextMode, exState: 'PREPARE', hideText: false });
     }
   }
 
@@ -301,15 +305,22 @@ export default class Editor extends React.Component<Props, State> {
       <>
         <Button
           onClick={() => {
-            this.setState({ exState: 'SOLVING' });
+            this.setState({ exState: 'SOLVING', hideText: false });
+            this.timer.restart();
           }}
           disabled={exState !== 'PREPARE'}
+          ref={input => {
+            this.timer = new Stopwatch(input, input);
+          }}
         >
-          実験開始
+          {exState === 'PREPARE'
+            ? '実験開始'
+            : Math.round(this.timer.seconds())}
         </Button>
         <Button
           onClick={() => {
-            this.setState({ exState: 'FINISH' });
+            this.setState({ exState: 'FINISH', hideText: false });
+            this.timer.stop();
           }}
           disabled={exState !== 'SOLVING'}
         >
@@ -321,14 +332,15 @@ export default class Editor extends React.Component<Props, State> {
 
   renderEditor() {
     const progLang = this.props.progLang;
-    const { fontSize, theme, exState, mode } = this.state;
+    const { fontSize, theme, exState, mode, hideText } = this.state;
     let text = '';
     if (this.props.mode === 'DEMO') {
       this.sourcecode = translate('ja', 'DEMO');
       text = translate('ja', 'message1');
     } else {
       if (exState === 'PREPARE') {
-        this.sourcecode = translate('ja', 'prepare');
+        text = translate('ja', 'prepare');
+        this.sourcecode = '[実験開始]後に表示されます';
       } else if (exState === 'SOLVING') {
         text = translate('ja', mode + 'Q');
         this.sourcecode = translate('ja', mode);
@@ -343,7 +355,11 @@ export default class Editor extends React.Component<Props, State> {
     return (
       <>
         {mode === 'DEMO' ? null : this.renderExpBtns()}
-        <pre>{text}</pre>
+        <pre onClick={() => this.setState({ hideText: !hideText })}>
+          {hideText
+            ? 'クリックすると説明文を再表示できます。'
+            : text + '\n※この説明文はクリックすることで非表示にできます。'}
+        </pre>
         <AceEditor
           ref={this.editorRef}
           mode={progLang}
