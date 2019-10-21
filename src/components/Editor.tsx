@@ -27,14 +27,15 @@ import {
 } from '../server';
 import translate from '../locales/translate';
 import { ExecState } from 'unicoen.ts/dist/interpreter/Engine/ExecState';
-import { LangProps, ProgLangProps, Theme } from './Props';
+import { LangProps, ProgLangProps, Theme, ModeProps, Mode } from './Props';
 import { SyntaxErrorData } from 'unicoen.ts/dist/interpreter/mapper/SyntaxErrorData';
 
-type Props = LangProps & ProgLangProps;
+type Props = LangProps & ProgLangProps & ModeProps;
 interface State {
   fontSize: number;
   showAlert: boolean;
   theme: Theme;
+  mode: Mode;
 }
 
 interface TextRectangle {
@@ -69,8 +70,8 @@ export default class Editor extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = { fontSize: 14, showAlert: false, theme: 'light' };
-    const { lang, progLang } = props;
+    const { lang, progLang, mode } = props;
+    this.state = { fontSize: 14, showAlert: false, theme: 'light', mode };
     this.sourcecode = translate(lang, this.sourceCodeKey(progLang));
     this.sentSourcecode = '';
 
