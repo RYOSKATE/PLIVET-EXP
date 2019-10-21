@@ -70,9 +70,10 @@ export default class Editor extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const { lang, progLang, mode } = props;
+    const { lang, mode } = props;
     this.state = { fontSize: 14, showAlert: false, theme: 'light', mode };
-    this.sourcecode = translate(lang, this.sourceCodeKey(progLang));
+    this.sourcecode = translate(lang, mode);
+    console.log(this.sourcecode, mode);
     this.sentSourcecode = '';
 
     this.hideAlert = this.hideAlert.bind(this);
@@ -143,16 +144,11 @@ export default class Editor extends React.Component<Props, State> {
     prog.replace(/_/g, '').replace(/^[a-z]/g, char => char.toUpperCase());
 
   componentWillReceiveProps(nextProps: Props) {
-    const { lang, progLang } = this.props;
-    const nextLang = nextProps.lang;
-    const nextProgLang = nextProps.progLang;
+    const { lang, mode } = this.props;
+    const nextMode = nextProps.mode;
 
-    if (nextLang !== lang) {
-      if (this.sourcecode === translate(lang, this.sourceCodeKey(progLang))) {
-        this.sourcecode = translate(nextLang, this.sourceCodeKey(nextProgLang));
-      }
-    } else if (nextProgLang !== progLang) {
-      this.sourcecode = translate(nextLang, this.sourceCodeKey(nextProgLang));
+    if (nextMode !== mode) {
+      this.sourcecode = translate(lang, nextMode);
     }
   }
 

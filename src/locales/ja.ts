@@ -128,5 +128,124 @@ public class Main {
     for j in range(p + c):
       a[j] = b[j]
   print(a[0])
-`
+`,
+  DEMO: String.raw`#include<stdio.h>
+int recursiveToThree(int n){
+    printf("%d times\n", n + 1);
+    if(n < 3){
+        int r = recursiveToThree(n + 1);
+        n = r;
+    }
+    return n;
+}
+int main(){
+    int n = 0;//変数宣言の例
+
+    n = recursiveToThree(0);//再帰関数呼び出しの例
+
+    int arr[5] = {1, 2, 3};//配列変数の例
+
+    int* ptr = &arr[2];//ポインタ変数の例
+    *ptr = 5;
+
+    //メモリの動的確保の例
+    int* d_arry = malloc(sizeof(int) * 3);
+
+    //動的な2次元配列の例
+    int* pd_arr[2];
+    pd_arr[0] = malloc(sizeof(int) * 2);
+    pd_arr[1] = malloc(sizeof(int) * 2);
+
+    printf("Hello,world!\n");//標準出力の例
+
+    //メモリリークの例
+    free(pd_arr[0]);
+    return 0;
+}`,
+  EX1: String.raw`void swap1(int* x, int* y){
+  int s = *x;
+  if(s<2){
+      *x = *y;
+      *y = s;
+  }
+}
+void swap2(int *z, int *w){
+  int t = *z;
+  if(t<3){
+      *z = *w;
+      *w = t;
+  }
+}
+void swap3(int *w, int *o){
+  int u = *w;
+  if(u<4){
+      *w = *o;
+      *o = u;
+  }else{
+      *o = 6;
+      swap1(o,w);
+  }
+}
+int main()
+{
+  int a = 1, b = 2, c = 3, d = 4, e = 5;
+  swap1(&a,&b);
+  swap3(&a,&c);
+  swap2(&e,&b);
+  swap3(&d,&e);
+  swap2(&b,&c);
+  swap1(&a,&d);
+  return 0;
+}`,
+  EX2: String.raw`#include<stdio.h>
+int f(int* pn){
+    int n = (*pn);
+    int r = 1;
+    if(1<=n){
+        (*pn) = n - 1;
+        r = n * f(pn);
+    }
+    return r;
+}
+int main()
+{
+    int n = 4;
+    int r = f(&n);
+    return 0;
+}`,
+  EX3: String.raw`#include<stdio.h>
+int main()
+{
+    int i,j,n=3;
+    int*ps[3];
+    for(i=0; i<n; ++i){
+        ps[i]=malloc(sizeof(int)*n);
+        for(j=0; j<n; ++j){
+            ps[i][j]=i*i + j*j;
+        }
+    }
+    for(i=0; i<n; ++i){
+        if(ps[i][2]%2==0)
+            free(ps[i]);
+    }
+    return 0;
+}`,
+  EX4: String.raw`#include<stdio.h>
+int H(int n,char a,char b,char c)
+{
+    if(n>=2){
+        H(n-1,a,c,b);
+    }
+
+    if(n>=2){
+        H(n-1,b,a,c);
+    }
+    return n;
+}
+
+int main()
+{
+    H(4,'A','B','C');
+    return 0;
+}`
 };
