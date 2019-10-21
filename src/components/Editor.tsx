@@ -31,11 +31,13 @@ import { LangProps, ProgLangProps, Theme, ModeProps, Mode } from './Props';
 import { SyntaxErrorData } from 'unicoen.ts/dist/interpreter/mapper/SyntaxErrorData';
 
 type Props = LangProps & ProgLangProps & ModeProps;
+type ExState = 'PREPARE' | 'SOLVING' | 'FINISH';
 interface State {
   fontSize: number;
   showAlert: boolean;
   theme: Theme;
   mode: Mode;
+  exState: ExState;
 }
 
 interface TextRectangle {
@@ -70,10 +72,15 @@ export default class Editor extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    const { lang, mode } = props;
-    this.state = { fontSize: 14, showAlert: false, theme: 'light', mode };
-    this.sourcecode = translate(lang, mode);
-    console.log(this.sourcecode, mode);
+    const { mode } = props;
+    this.state = {
+      fontSize: 14,
+      showAlert: false,
+      theme: 'light',
+      mode,
+      exState: 'PREPARE'
+    };
+    this.sourcecode = '';
     this.sentSourcecode = '';
 
     this.hideAlert = this.hideAlert.bind(this);
@@ -147,8 +154,9 @@ export default class Editor extends React.Component<Props, State> {
     const { lang, mode } = this.props;
     const nextMode = nextProps.mode;
 
-    if (nextMode !== mode) {
+    if (mode !== nextMode) {
       this.sourcecode = translate(lang, nextMode);
+      this.setState({ mode: nextMode, exState: 'PREPARE' });
     }
   }
 
@@ -287,40 +295,86 @@ export default class Editor extends React.Component<Props, State> {
     );
   }
 
-  renderEditor() {
-    const mode = this.props.progLang;
-    const { fontSize, theme } = this.state;
+  renderExpBtns() {
+    const { exState } = this.state;
     return (
-      <AceEditor
-        ref={this.editorRef}
-        mode={mode}
-        theme={theme === 'light' ? 'textmate' : 'monokai'}
-        value={this.sourcecode}
-        name="sourcecode"
-        fontSize={fontSize}
-        tabSize={2}
-        editorProps={{
-          $blockScrolling: Infinity
-        }}
-        setOptions={{
-          enableBasicAutocompletion: true,
-          enableLiveAutocompletion: true,
-          showLineNumbers: true,
-          readOnly: false
-        }}
-        style={{ height: '62vh', width: 'auto' }}
-        className="editorMain"
-        onChange={(text: string) => {
-          this.sourcecode = text;
-          const delaySyntaxCheck = (code: string) => {
-            if (code === this.sourcecode) {
-              signal('debug', 'SyntaxCheck');
-            }
-          };
-          setTimeout(() => delaySyntaxCheck(text), 1000);
-        }}
-        onBeforeLoad={ace => (this.ace = ace)}
-      />
+      <>
+        <Button
+          onClick={() => {
+            this.setState({ exState: 'SOLVING' });
+          }}
+          disabled={exState !== 'PREPARE'}
+        >
+          実験開始
+        </Button>
+        <Button
+          onClick={() => {
+            this.setState({ exState: 'FINISH' });
+          }}
+          disabled={exState !== 'SOLVING'}
+        >
+          答えを確認
+        </Button>
+      </>
+    );
+  }
+
+  renderEditor() {
+    const progLang = this.props.progLang;
+    const { fontSize, theme, exState, mode } = this.state;
+    let text = '';
+    if (this.props.mode === 'DEMO') {
+      this.sourcecode = translate('ja', 'DEMO');
+      text = translate('ja', 'message1');
+    } else {
+      if (exState === 'PREPARE') {
+        this.sourcecode = translate('ja', 'prepare');
+      } else if (exState === 'SOLVING') {
+        text = translate('ja', mode + 'Q');
+        this.sourcecode = translate('ja', mode);
+      } else if (exState === 'FINISH') {
+        text =
+          translate('ja', mode + 'Q') + '\n答え ' + translate('ja', mode + 'A');
+        this.sourcecode = translate('ja', mode);
+      }
+    }
+    console.log('Editor', this.state.mode);
+
+    return (
+      <>
+        {mode === 'DEMO' ? null : this.renderExpBtns()}
+        <pre>{text}</pre>
+        <AceEditor
+          ref={this.editorRef}
+          mode={progLang}
+          theme={theme === 'light' ? 'textmate' : 'monokai'}
+          value={this.sourcecode}
+          name="sourcecode"
+          fontSize={fontSize}
+          tabSize={2}
+          editorProps={{
+            $blockScrolling: Infinity
+          }}
+          setOptions={{
+            enableBasicAutocompletion: true,
+            enableLiveAutocompletion: true,
+            showLineNumbers: true,
+            readOnly: false
+          }}
+          style={{ height: '62vh', width: 'auto' }}
+          className="editorMain"
+          onChange={(text: string) => {
+            this.sourcecode = text;
+            const delaySyntaxCheck = (code: string) => {
+              if (code === this.sourcecode) {
+                signal('debug', 'SyntaxCheck');
+              }
+            };
+            setTimeout(() => delaySyntaxCheck(text), 1000);
+          }}
+          onBeforeLoad={ace => (this.ace = ace)}
+        />
+      </>
     );
   }
 
