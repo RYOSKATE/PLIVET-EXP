@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/lib/Button';
 import Glyphicon from 'react-bootstrap/lib/Glyphicon';
 import translate from '../../../locales/translate';
 import { signal, event } from '../../emitter';
+import { addLog } from '../../../utils/log';
 
 interface Props {
   lang: string;
@@ -32,6 +33,7 @@ export default class CtrlButton extends React.Component<Props, State> {
             this.props.onClick();
           }
           signal(this.props.signal, this.props.command);
+          addLog(this.props.command);
         }}
         className="btn-outline-dark"
         disabled={!this.props.enable}

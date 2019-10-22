@@ -29,7 +29,8 @@ import translate from '../locales/translate';
 import { ExecState } from 'unicoen.ts/dist/interpreter/Engine/ExecState';
 import { LangProps, ProgLangProps, Theme, ModeProps, Mode } from './Props';
 import { SyntaxErrorData } from 'unicoen.ts/dist/interpreter/mapper/SyntaxErrorData';
-import Stopwatch from '../utils/Stopwatch';
+import Stopwatch from '../utils/stopwatch';
+import { addLog } from '../utils/log';
 type Props = LangProps & ProgLangProps & ModeProps;
 type ExState = 'PREPARE' | 'SOLVING' | 'FINISH';
 interface State {
@@ -310,13 +311,13 @@ export default class Editor extends React.Component<Props, State> {
       if (this.timer !== null) {
         this.timer.stop();
         finishTime = Math.round(this.timer.seconds()).toString() + '秒';
-        this.timer = null;
       }
     }
     return (
       <>
         <Button
           onClick={() => {
+            addLog(this.state.mode + '#START');
             this.setState({ exState: 'SOLVING', hideText: false });
           }}
           disabled={exState !== 'PREPARE'}
@@ -342,7 +343,7 @@ export default class Editor extends React.Component<Props, State> {
         </Button>
         <Button
           onClick={() => {
-            console.log('stop');
+            addLog(this.state.mode + '#FINISH');
             this.setState({ exState: 'FINISH', hideText: false });
           }}
           disabled={exState !== 'SOLVING'}
@@ -363,7 +364,7 @@ export default class Editor extends React.Component<Props, State> {
     } else {
       if (exState === 'PREPARE') {
         text = translate('ja', 'prepare');
-        this.sourcecode = '[実験開始]後に表示されます';
+        this.sourcecode = '[実験開始]押下後に表示されます';
       } else if (exState === 'SOLVING') {
         text = translate('ja', mode + 'Q');
         this.sourcecode = translate('ja', mode);
