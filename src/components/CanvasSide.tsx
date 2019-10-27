@@ -37,7 +37,7 @@ export default class CanvasSide extends React.Component<Props, State> {
           />
         </Col>
         <Col lg={1} md={1} sm={1} xs={1}>
-          <Button onClick={() => deleteLog()}>ログ削除</Button>
+          <Button onClick={() => deleteLog()}>記録終了</Button>
         </Col>
         <Col lg={12} md={12} sm={12} xs={12}>
           <ContainerDimensions>

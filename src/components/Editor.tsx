@@ -392,12 +392,7 @@ export default class Editor extends React.Component<Props, State> {
             <Panel.Body style={{ padding: 1 }}>
               <div
                 dangerouslySetInnerHTML={{
-                  __html: `${text}
-※この説明文はクリックすることで非表示にできます。
-※下部の出力ウィンドウなどが見づらい場合は折りたたんでください。`.replace(
-                    /\n/g,
-                    '<br>'
-                  )
+                  __html: text.replace(/\n/g, '<br>')
                 }}
               />
             </Panel.Body>

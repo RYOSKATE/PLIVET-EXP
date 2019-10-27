@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/lib/Col';
 import Button from 'react-bootstrap/lib/Button';
 import CtrlButtons from './controle_buttons/CtrlButtons';
 import { LangProps, Mode, ModeProps } from '../Props';
-import { slot } from '../emitter';
+import { slot, signal } from '../emitter';
 import { DEBUG_STATE } from '../../server';
 import { saveLog, flushLogToSave, addLog } from '../../utils/log';
 
@@ -44,6 +44,7 @@ export default class Menu extends React.Component<Props, State> {
               this.props.setMode(mode);
               flushLogToSave();
               addLog(mode);
+              signal('debug', 'Stop');
             }}
           >
             {mode}
