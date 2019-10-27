@@ -31,6 +31,7 @@ import { LangProps, ProgLangProps, Theme, ModeProps, Mode } from './Props';
 import { SyntaxErrorData } from 'unicoen.ts/dist/interpreter/mapper/SyntaxErrorData';
 import Stopwatch from '../utils/stopwatch';
 import { addLog } from '../utils/log';
+import Panel from 'react-bootstrap/lib/Panel';
 type Props = LangProps & ProgLangProps & ModeProps;
 type ExState = 'PREPARE' | 'SOLVING' | 'FINISH';
 interface State {
@@ -378,11 +379,30 @@ export default class Editor extends React.Component<Props, State> {
     return (
       <>
         {mode === 'DEMO' ? null : this.renderExpBtns()}
-        <pre onClick={() => this.setState({ hideText: !hideText })}>
-          {hideText
-            ? 'クリックすると説明文を再表示できます。'
-            : text + '\n※この説明文はクリックすることで非表示にできます。'}
-        </pre>
+        <Panel
+          id="collapsible-panel-example-2"
+          expanded={!hideText}
+          onToggle={() => this.setState({ hideText: !hideText })}
+          style={{ fontSize: 12 }}
+        >
+          <Panel.Heading style={{ padding: 1 }}>
+            <Panel.Title toggle>説明(クリックで折りたたみ可)</Panel.Title>
+          </Panel.Heading>
+          <Panel.Collapse>
+            <Panel.Body style={{ padding: 1 }}>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: `${text}
+※この説明文はクリックすることで非表示にできます。
+※下部の出力ウィンドウなどが見づらい場合は折りたたんでください。`.replace(
+                    /\n/g,
+                    '<br>'
+                  )
+                }}
+              />
+            </Panel.Body>
+          </Panel.Collapse>
+        </Panel>
         <AceEditor
           ref={this.editorRef}
           mode={progLang}
