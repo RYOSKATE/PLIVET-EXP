@@ -15,11 +15,22 @@ interface Props {
   colors?: string[];
 }
 
-interface State {}
+interface State {
+  fill: string;
+}
 
 export default class TextWithRect extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
+    this.state = { fill: '#ff4b00' };
+  }
+  componentWillReceiveProps(nextProps: Props) {
+    if (nextProps.text !== this.props.text) {
+      console.log(nextProps.text, this.props.text);
+      this.setState({ fill: '#ff4b00' });
+    } else {
+      this.setState({ fill: 'black' });
+    }
   }
   render() {
     if (!this.props.isVisible) {
@@ -68,6 +79,7 @@ export default class TextWithRect extends React.Component<Props, State> {
           text={text}
           fontSize={CanvasCell.FONT_SIZE}
           onClick={onClick ? onClick : undefined}
+          fill={this.state.fill}
         />
       </React.Fragment>
     );
