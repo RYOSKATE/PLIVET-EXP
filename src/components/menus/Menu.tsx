@@ -61,7 +61,7 @@ export default class Menu extends React.Component<Props, State> {
           <Row>
             {this.renderBtns()}
             <Col lg={2} md={2} sm={2} xs={2}>
-              <Button onClick={() => saveLog()}>終了</Button>
+              <Button onClick={() => saveLog()}>回答終了</Button>
             </Col>
           </Row>
         </Col>
