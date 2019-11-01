@@ -371,7 +371,10 @@ export default class Editor extends React.Component<Props, State> {
         this.sourcecode = translate('ja', mode);
       } else if (exState === 'FINISH') {
         text =
-          translate('ja', mode + 'Q') + '\n答え ' + translate('ja', mode + 'A');
+          translate('ja', mode + 'Q') +
+          '\n答え ' +
+          translate('ja', mode + 'A') +
+          '\n実験結果ファイルに[正解/不正解]と[経過時間]を記入し、\n次の問題に進んでください。';
         this.sourcecode = translate('ja', mode);
       }
     }
