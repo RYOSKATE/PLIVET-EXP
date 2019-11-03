@@ -13,6 +13,7 @@ interface Props {
   onClick?: () => void;
   isVisible: boolean;
   colors?: string[];
+  isValueCell?: boolean;
 }
 
 interface State {
@@ -22,14 +23,16 @@ interface State {
 export default class TextWithRect extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
-    this.state = { fill: '#ff4b00' };
+    this.state = { fill: props.isValueCell ? '#ff4b00' : 'black' };
   }
   componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.text !== this.props.text) {
-      console.log(nextProps.text, this.props.text);
-      this.setState({ fill: '#ff4b00' });
-    } else {
-      this.setState({ fill: 'black' });
+    if (nextProps.isValueCell) {
+      if (nextProps.text !== this.props.text) {
+        console.log(nextProps.text, this.props.text);
+        this.setState({ fill: '#ff4b00' });
+      } else {
+        this.setState({ fill: 'black' });
+      }
     }
   }
   render() {
