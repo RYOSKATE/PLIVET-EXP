@@ -21,15 +21,18 @@ interface State {
 }
 
 export default class TextWithRect extends React.Component<Props, State> {
+  public static readonly ACCENT_COLOR = '#ff4b00';
   constructor(props: Props) {
     super(props);
-    this.state = { fill: props.isValueCell ? '#ff4b00' : 'black' };
+    this.state = {
+      fill: props.isValueCell ? TextWithRect.ACCENT_COLOR : 'black'
+    };
   }
   componentWillReceiveProps(nextProps: Props) {
     if (nextProps.isValueCell) {
       if (nextProps.text !== this.props.text) {
         console.log(nextProps.text, this.props.text);
-        this.setState({ fill: '#ff4b00' });
+        this.setState({ fill: TextWithRect.ACCENT_COLOR });
       } else {
         this.setState({ fill: 'black' });
       }

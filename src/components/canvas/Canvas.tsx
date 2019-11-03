@@ -30,6 +30,7 @@ export default class Canvas extends React.Component<Props, State> {
           scale={{ x: this.props.scale, y: this.props.scale }}
         >
           <CanvasContent
+            canvasWidth={0.95 * this.props.width}
             canvasDrawer={new CanvasDrawer(this.state.execState)}
           />
         </Stage>
