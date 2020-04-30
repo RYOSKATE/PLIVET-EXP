@@ -74,7 +74,7 @@
     "husky": "3.0.9",
     "identity-obj-proxy": "3.0.0",
     "jest": "24.9.0",
-    "jquery": "3.4.1",
+    "jquery": "3.5.0",
     "konva": "4.0.15",
     "lint-staged": "9.4.2",
     "popper.js": "1.16.0",
